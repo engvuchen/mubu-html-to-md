@@ -4,90 +4,114 @@ const attrReg = /\[(.+)\]/g;
 const tagReg = /^(\w+)/;
 
 const html = fs.readFileSync('./01-Vue+常见面试题.html', 'utf-8');
-
-// console.log(parser(html)) // Logs a PostHTML AST
-
 let docTypeHtmlList = parser(html);
-// let bodyJSON = docTypeHtmlList?.find(currItem => currItem.tag === 'html')?.content?.find(currItem => currItem.tag === 'body');
 let bodyJSON = pipeSearch(['html', 'body'], docTypeHtmlList);
-
-// console.log('docTypeHtmlList', docTypeHtmlList);
-
-console.log('bodyJSON', bodyJSON);
-
 let title = pipeSearch(['div'], bodyJSON?.content)?.content?.[0] || `${getDate()}`;
 let md = `# ${title}\n`;
+walk(bodyJSON?.content);
+
 function walk(list = [], depth = 2) {
   let { length: len } = list;
   if (!len) return;
-  for (let i = 0; i < len; i++) {
-    let curr = list[i];
-    if (typeof curr !== 'object') continue;
 
-    // ul > li > div.content + div.children
-    let title = pipeSearch(['div[class="content"]'], curr?.content)?.content[0]?.content?.[0];
-    if (title) {
-      if (depth < 4) title = `${title.padStart(title.length + depth, '#')}`;
-      md += title;
+  // ul > li * n > ( div.content + div.image-list + div.note +  div.children )
+  let ulList = search('ul[class="node-list"]', list) || [];
+  let { length: ulListLen } = ulList;
+  for (let i = 0; i < ulListLen; i++) {
+    let ul = ulList[i];
+    let liList = search('li[class="node"]', ul.content) || [];
+    let { length: liListLen } = liList;
+    if (!liListLen) continue;
+    for (let i = 0; i < liListLen; i++) {
+      let li = liList[i];
+
+      // todo: title 节点旁边，还有 div.image-list / div.note
+      let titleDiv = search('div[class="content"]', li.content)[0];
+      let title = titleDiv?.content?.reduce((accu, curr) => {
+        accu += curr?.content?.[0] || '' + '';
+        return accu;
+      }, '');
+      if (title) {
+        if (depth < 10) title = `${getMdTitle(depth) + title}`;
+        md += `${title}\n`;
+      }
+      // let ulImageList = search('ul[class="image-list"]', li.content)[0];
+
+      let childContentList = search('div[class="children"]', li.content) || [];
+      let { length: childContentListLen } = childContentList;
+      for (let i = 0; i < childContentListLen; i++) {
+        walk(childContentList[i]?.content || [], depth + 1);
+      }
     }
-
-    let content = pipeSearch(['div[class="content"]'])?.content;
-    if (Array.isArray(content) && content.length) walk(content, depth + 1);
   }
 }
-let ulJSON = pipeSearch(['ul'], bodyJSON?.content);
-walk(ulJSON?.content);
+function padImgsToMd(liContentList) {
+  let ulImageList = search('ul[class="image-list"]', li.content)[0];
+}
 
+// 找到一个 list 中符合 指定条件的 项 - 遍历第一个匹配的内容
 function pipeSearch(tags = [], list = []) {
   let result;
 
-  tags.reduce((accu, currTag) => {
+  tags.forEach(currTag => {
     if (!Array.isArray(list) || (Array.isArray(list) && !list.length)) {
-      console.error('pipeSearch: list is empty');
       return;
     }
-
     let conditions = genConditions(currTag);
-    // console.log('conditions', conditions)
-
     let foundResult = list.find(currItem => {
       if (typeof currItem !== 'object') return;
-      // todo:
-      // let conditions = [attrName ? currItem?.attrs?.[attrName] === attrVal : true, currItem.tag === tag];
-      return conditions.every(condition => condition(currItem));
+      if (conditions.some(conditionFn => !conditionFn(currItem))) return false;
+      return true;
     });
-
     if (!foundResult) return;
     list = foundResult?.content;
     result = foundResult;
-  }, {});
+  });
 
-  console.log('result', result);
-
+  // console.log('result', result);
   return result;
 }
-function genConditions(search) {
+function search(tag = '', list) {
+  if (!Array.isArray(list) || (Array.isArray(list) && !list.length)) {
+    return;
+  }
+  let conditions = genConditions(tag);
+  return list?.filter(currItem => {
+    if (typeof currItem !== 'object') return;
+    if (conditions.some(conditionFn => !conditionFn(currItem))) return false;
+    return currItem;
+  });
+}
+
+function genConditions(searchStr = '') {
+  // 构造标签条件
+  let tagConditionFn = (tag, data) => {
+    // console.log('tagFn', data.tag, tag);
+    return data?.tag === tag;
+  };
+  let tagConditions = [];
+  let [, tag = ''] = tagReg.exec(searchStr) || [];
+  if (tag) tagConditions.push(tagConditionFn.bind(this, tag));
+
+  // 构造属性条件
   let attrConditions =
-    Array.from(search.matchAll(attrReg))?.reduce((accu, currList) => {
+    Array.from(searchStr.matchAll(attrReg))?.reduce((accu, currList) => {
       let [, attrStr] = currList;
       if (!attrStr) return; // 获取 div[class="content"] 方括号的内容
       let [attrName, attrVal] = attrStr.split('=');
-      accu.push(data => {
-        // console.log('data', data);
-        // console.log('attrVal', attrVal);
+      attrVal = attrVal.replace(/"/g, '');
+      if (attrVal) {
+        let attrConditionFn = (attrName, attrVal, data) => {
+          // console.log('attrValFn', data?.attrs?.[attrName], attrVal);
 
-        return data?.attrs?.[attrName] === attrVal;
-      });
+          return data?.attrs?.[attrName].includes(attrVal);
+        };
+        accu.push(attrConditionFn.bind(this, attrName, attrVal));
+      }
       return accu;
     }, []) || [];
 
-  let [, tag] = tagReg.exec(search) || [];
-  attrConditions.push(data => {
-    return data?.tag === tag;
-  });
-
-  // console.log('attrConditions', attrConditions);
-  return attrConditions;
+  return [...tagConditions, ...attrConditions];
 }
 function getDate() {
   let date = new Date();
@@ -95,6 +119,9 @@ function getDate() {
     2,
     '0'
   )}`;
+}
+function getMdTitle(depth) {
+  return new Array(depth).fill('#').join('') + ' ';
 }
 
 fs.writeFileSync('./result.md', md);
