@@ -1,0 +1,14 @@
+{
+  "name": "parse-mubu-html-to-md",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "parse": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "posthtml-parser": "^0.11.0"
+  }
+}
