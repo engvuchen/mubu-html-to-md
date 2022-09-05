@@ -1,43 +1,67 @@
 # 01-Vue 常见面试题
+
 ## 1、说说你对 SPA 单页面的理解，它的优缺点分别是什么？
-![](https://api2.mubu.com/v3/document_image/ce73cd19-d9b8-4d32-9a4f-aa647b9ecc07-371922.jpg)
-![](https://api2.mubu.com/v3/document_image/fc10022c-8cf6-45ed-959d-adeaa15a08c5-371922.jpg)
-> aggag
-ageage 
+
 ### SPA（ single-page application ）仅在 Web 页面初始化时加载相应的 HTML、JavaScript 和 CSS。一旦页面加载完成，SPA 不会因为用户的操作而进行页面的重新加载或跳转；取而代之的是利用路由机制实现 HTML 内容的变换，UI 与用户的交互，避免页面的重新加载。
+
 ### 优点：
+
 #### 用户体验好，页面内容的改变不需要重新加载整个页面，避免了不必要的跳转和重复渲染；
-#### 减少了 HTML文件的请求，SPA 相对对服务器压力小；
-> 以前是一个请求一个页面（HTML/CSS/JS），现在是一个页面+一套样式+多个JS请求 
+
+#### 减少了 HTML 文件的请求，SPA 相对对服务器压力小；
+
+> 以前是一个请求一个页面（HTML/CSS/JS），现在是一个页面+一套样式+多个 JS 请求
+
 #### 前后端职责分离；前端进行交互逻辑，后端负责数据处理；
+
 ### 缺点：
+
 #### 初次加载耗时多：为实现单页 Web 应用功能及显示效果，需要在加载页面的时候将 JavaScript、CSS 统一加载，部分页面按需加载；
+
 #### 自行管理前进后退路由：单页应用在一个页面中显示所有的内容，单页面切换需要开发者建立堆栈管理，不能依赖原生浏览器的前进后退功能，
+
 #### SEO 弱势：由于所有的内容都在一个页面中动态替换显示，在 SEO 上其有着天然的弱势。
-> 只有一个 HTML 文件，使用 JS 修改显示内容；唯一的 HTML 文件 meta 标签描述的内容有限、不精准，不能很好匹配搜索引擎的 SEO 算法； 
+
+> 只有一个 HTML 文件，使用 JS 修改显示内容；唯一的 HTML 文件 meta 标签描述的内容有限、不精准，不能很好匹配搜索引擎的 SEO 算法；
+
 ## 2、v-show 与 v-if 有什么区别？
+
 ### v-if 是真正的条件渲染，它确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建；也是惰性的：如果在初始渲染时条件为假，则什么也不做——直到条件第一次变为真时，才会开始渲染条件块。
-### v-show  就简单得多——不管初始条件是什么，元素总是会被渲染，只是简单地基于 CSS 的 “display” 属性进行切换。
+
+### v-show 就简单得多——不管初始条件是什么，元素总是会被渲染，只是简单地基于 CSS 的 “display” 属性进行切换。
+
 ### 所以，v-if 适用于在运行时很少改变条件，不需要频繁切换条件的场景；v-show 则适用于需要非常频繁切换条件的场景。
+
 ## 3、Class 与 Style 如何动态绑定？
-### Class  - 控制类名的有无
+
+### Class - 控制类名的有无
+
 #### 对象语法 - { active: isActive, 'text-danger': hasError } - { key: &lt;Boolean&gt; } - 普通对象，但值是 Boolean 类型；
+
 ![](https://api2.mubu.com/v3/document_image/799eac4f-0df3-4613-a495-3b775d091b58-371922.jpg)
+
 #### 数组语法 - ['xxx' || ''] - 字符串数组 - 字符串是类名
+
 ![](https://api2.mubu.com/v3/document_image/c345fa06-0936-4f35-ae7e-18c715cae180-371922.jpg)
+
 ### Style - 指定对象 Key-Value 的 Value 的值
-#### 对象语法：- { key: value } - 普通对象（样式对象） - key 是样式名，value  是样式单位
+
+#### 对象语法：- { key: value } - 普通对象（样式对象） - key 是样式名，value 是样式单位
+
 ![](https://api2.mubu.com/v3/document_image/4d2d3a9b-7c7f-4cd4-87f1-43bb9f01c015-371922.jpg)
-> ``` 
-&lt;div v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }"&gt;&lt;/div&gt;&lt;br&gt;data: {
-  activeColor: 'red',
-  fontSize: 30
-}
-复制代码
-```&lt;br&gt; 
+
+> ```
+> &lt;div v-bind:style="{ color: activeColor, fontSize: fontSize + 'px' }"&gt;&lt;/div&gt;&lt;br&gt;data: {
+>   activeColor: 'red',
+>   fontSize: 30
+> }
+> 复制代码
+> ```
+
+````<br>
 #### 数组语法：- [ { key: value } ] -  普通对象数组 - 对象符合“样式对象”定义
 ![](https://api2.mubu.com/v3/document_image/bd8a3698-8e7f-4d32-83dc-6c54ffa63761-371922.jpg)
-> ``` 
+> ```
 &lt;div v-bind:style="[styleColor, styleSize]"&gt;&lt;/div&gt;&lt;br&gt;data: {
   styleColor: {
      color: 'red'
@@ -47,7 +71,7 @@ ageage
   }
 }
 复制代码
-```&lt;br&gt; 
+```&lt;br&gt;
 ### 小结
 #### Class / Style 都支持对象 / 数组语法; 但语法使用的对象结构不一样
 #### Class 对象语法，使用 { [ClassName]: &lt;Boolean&gt; } 的对象；数组语法，数组项是类名字符串；
@@ -76,10 +100,10 @@ ageage
 #### Vue.set：Vue.set(vm.items, indexOfItem, newValue)
 #### vm.$set：Vue.set 的一个别名：vm.set(vm.items, indexOfItem, newValue)
 #### Array.prototype.splice：vm.items.splice(indexOfItem, 1, newValue)
-> splice() 
+> splice()
 ### (2) 修改数组的长度，例：vm.items.length = newLength；解决方案：
 #### Array.prototype.splice：vm.items.splice(newLength)
-> array.splice(start[, deleteCount[, item1[, item2[, ...]]]]) 
+> array.splice(start[, deleteCount[, item1[, item2[, ...]]]])
 ### Proxy 通过 get / set 能完美监听数组
 #### get: list.length / list.push
 #### set: list[0] = xxx; list.length = 3;
@@ -88,10 +112,10 @@ ageage
 ### 各个生命周期的作用
 #### beforeCreate：组件实例被创建之初，组件的属性生效之前
 #### 💡❗created：组件实例已经完全创建，属性也绑定，但真实 dom 还没有生成，$el还不可用
-> 最早调用  
+> 最早调用
 #### beforeMount：在挂载开始之前被调用：相关的 render 函数首次被调用；
 #### 💡❗mounted：el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子
-> 最早可以操作  
+> 最早可以操作
 #### beforeUpdate：组件数据更新之前调用，发生在虚拟 DOM 打补丁之前
 #### 💡update：组件数据更新之后
 #### activited：keep-alive 专属，组件被激活时调用
@@ -104,15 +128,15 @@ ageage
 ## 8、Vue 的父组件和子组件生命周期钩子函数执行顺序？
 ### Vue 的父组件和子组件生命周期钩子函数执行顺序可以归类为以下 4 部分：
 ### （1）父组件加载渲染过程
-> ❗在父组件 mounted 前 (beforeMount)，先加载完所有子组件（走完子组件到 mounted 的流程） 
+> ❗在父组件 mounted 前 (beforeMount)，先加载完所有子组件（走完子组件到 mounted 的流程）
 #### 父 beforeCreate -&gt; 父 created -&gt; 父 beforeMount -&gt; 走完子组件 mounted 流程（子 beforeCreate -&gt; 子 created -&gt; 子 beforeMount -&gt; 子 mounted） -&gt; 父 mounted
 ### （2）父组件更新过程
 #### 父 beforeUpdate -&gt; 父 updated
 ### （3）子组件更新过程
-> 子组件自身的更新周期被父组件的更新周期 
+> 子组件自身的更新周期被父组件的更新周期
 #### 父 beforeUpdate -&gt; 子 beforeUpdate -&gt; 子 updated -&gt; 父 updated
 ### （4）父组件销毁过程
-> 销毁父组件前，先销毁子组件 
+> 销毁父组件前，先销毁子组件
 #### 父 beforeDestroy -&gt; 子 beforeDestroy -&gt; 子 destroyed -&gt; 父 destroyed
 ## 9、在哪个生命周期内调用异步请求？
 ### 可以在钩子函数 created、beforeMount、mounted 中进行调用，因为在这三个钩子函数中，data 已经创建，可以将服务端端返回的数据进行赋值。
@@ -134,9 +158,9 @@ ageage
 ##### &lt;Child @hook:mounted="doSomething" &gt;&lt;/Child&gt;
 ##### doSomething() {    console.log('父组件监听到 mounted 钩子函数 ...'); },
 ####  Child.vue
-##### mounted() {  console.log('子组件触发 mounted 钩子函数 ...'); }, 
+##### mounted() {  console.log('子组件触发 mounted 钩子函数 ...'); },
 #### 以上输出顺序为：
-##### 子组件触发 mounted 钩子函数 ... 
+##### 子组件触发 mounted 钩子函数 ...
 ##### 父组件监听到 mounted 钩子函数 ...
 ####  @hook方法不仅可以监听 mounted，其它的生命周期事件，例：created，updated 等，都可以监听。
 ## 12、谈谈你对 keep-alive 的了解？
@@ -200,12 +224,12 @@ ageage
 ### SSR 就是将 vue 在客户端将标签渲染成的整个 html 片段的工作在服务端完成，服务端形成的 html 片段直接返回给客户端。这个过程就叫做服务端渲染。
 ### （1）服务端渲染的优点：
 #### 更好的 SEO：SPA 页面的内容是通过 Ajax 获取的，而搜索引擎爬取工具不会等待 Ajax 异步完成后再抓取页面内容，所以在 SPA（Single Page Application） 中是抓取不到页面通过 Ajax 获取到的内容；而 SSR 是直接由服务端返回已经渲染好的页面（数据已经包含在页面中），搜索引擎爬取工具可以抓取渲染好的页面；
-> 感觉只是初始 HTML 页面难以描述整个系统的功能： 
+> 感觉只是初始 HTML 页面难以描述整个系统的功能：
 #### 首屏加载更快： SPA 会等待所有 Vue 编译后的 js 文件都下载完成后，才开始进行页面的渲染，文件下载等需要一定的时间等，所以首屏渲染需要一定的时间；SSR 直接由服务端渲染好页面直接返回显示，无需等待下载 js 文件及再去渲染等，所以 SSR 有更快的内容到达时间；
 ### （2) 服务端渲染的缺点：
 #### 更多的开发条件限制： 例如服务端渲染只支持 beforCreate 和 created 两个钩子函数，这会导致一些外部扩展库需要特殊处理，才能在服务端渲染应用程序中运行；并且与可以部署在任何静态文件服务器上的完全静态单页面应用程序 SPA 不同，服务端渲染应用程序，需要处于 Node.js server 运行环境；
 #### 更高的服务器负载：在 Node.js 中渲染完整的应用程序，显然会比仅仅提供静态文件的 server 更加大量占用 CPU 资源 (CPU-intensive - CPU 密集)；如果你预料在高流量环境 ( high traffic ) 下使用，请准备相应的服务器负载，并明智地采用缓存策略。
-> 单页面的静态 HTML 发给客户端浏览器，然后 Vue 就会根据对应逻辑构建页面；对于 SSR，这个构建流程在服务器上了 
+> 单页面的静态 HTML 发给客户端浏览器，然后 Vue 就会根据对应逻辑构建页面；对于 SSR，这个构建流程在服务器上了
 ### 如果没有 SSR 开发经验的同学，可以参考本文作者的另一篇 SSR 的实践文章《Vue SSR 踩坑之旅》  ，里面 SSR 项目搭建以及附有项目源码。
 ### 小结：
 #### 案例：
@@ -305,7 +329,7 @@ ageage
 ##### 拦截 Proxy 实例作为构造函数调用的操作，比如new proxy(...args)。
 #### 返回的是一个新对象，我们可以只操作新的对象达到目的，而 Object.defineProperty 只能遍历对象属性直接修改；
 #### 享受新标准的性能红利：作为新标准将受到浏览器厂商重点持续的性能优化
-> MDN 文档： 
+> MDN 文档：
 ### Object.defineProperty 的优势：兼容性好，支持 IE9
 #### Proxy 存在浏览器兼容性问题，且无法用 polyfill 磨平，因此 Vue 的作者才声明需要等到下个大版本 (3.0) 才能用 Proxy 重写。
 ## 24、Vue 的 vm.$set() 的实现原理 （解决对象新增属性不能响应）
@@ -395,3 +419,4 @@ ageage
 ##### 基于 treeshaking 优化，提供了更多的内置功能。
 ## 30、说说你使用 Vue 框架踩过最大的坑是什么？怎么解决的？
 ## 来源
+````

@@ -9,7 +9,7 @@ let bodyJSON = pipeSearch(['html', 'body'], docTypeHtmlList);
 let title = pipeSearch(['div'], bodyJSON?.content)?.content?.[0] || `${getDate()}`;
 let md = `# ${title}\n`;
 walk(bodyJSON?.content);
-fs.writeFileSync('./src/result.md', md);
+fs.writeFileSync('./src/vue.md', md);
 
 function walk(list = [], depth = 2) {
   let { length: len } = list;
