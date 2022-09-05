@@ -32,8 +32,11 @@ function walk(list = [], depth = 2) {
         titleDiv?.content?.reduce((accu, curr) => {
           let txtInSpan = curr?.content?.[0];
           if (typeof txtInSpan === 'string') {
+            let className = curr?.attrs?.class;
+            if (className?.includes('bold')) txtInSpan = `**${txtInSpan}**`;
+            if (className?.includes('codepan')) txtInSpan = `\`${txtInSpan}\``;
             accu += txtInSpan;
-          }
+          } 
           return accu;
         }, '') || '';
       if (title) {
