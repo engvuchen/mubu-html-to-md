@@ -3,12 +3,13 @@ const fs = require('fs');
 const attrReg = /\[(.+)\]/g;
 const tagReg = /^(\w+)/;
 
-const html = fs.readFileSync('./01-Vue+常见面试题.html', 'utf-8');
+const html = fs.readFileSync('./src/01-Vue+常见面试题.html', 'utf-8');
 let docTypeHtmlList = parser(html);
 let bodyJSON = pipeSearch(['html', 'body'], docTypeHtmlList);
 let title = pipeSearch(['div'], bodyJSON?.content)?.content?.[0] || `${getDate()}`;
 let md = `# ${title}\n`;
 walk(bodyJSON?.content);
+fs.writeFileSync('./src/result.md', md);
 
 function walk(list = [], depth = 2) {
   let { length: len } = list;
@@ -25,18 +26,37 @@ function walk(list = [], depth = 2) {
     for (let i = 0; i < liListLen; i++) {
       let li = liList[i];
 
-      // todo: title 节点旁边，还有 div.image-list / div.note
+      // 处理标题
       let titleDiv = search('div[class="content"]', li.content)[0];
-      let title = titleDiv?.content?.reduce((accu, curr) => {
-        accu += curr?.content?.[0] || '' + '';
-        return accu;
-      }, '');
+      let title =
+        titleDiv?.content?.reduce((accu, curr) => {
+          let txtInSpan = curr?.content?.[0];
+          if (typeof txtInSpan === 'string') {
+            accu += txtInSpan;
+          }
+          return accu;
+        }, '') || '';
       if (title) {
         if (depth < 10) title = `${getMdTitle(depth) + title}`;
         md += `${title}\n`;
       }
-      // let ulImageList = search('ul[class="image-list"]', li.content)[0];
+      // 处理图片
+      let ulImage = search('ul[class="image-list"]', li.content)?.[0] || {}; // 多张图片，只有一个图片列表
+      let liImageItemList = search('li[class="image-item"]', ulImage.content) || [];
+      let { length: liImageItemListLen } = liImageItemList;
+      for (let i = 0; i < liImageItemListLen; i++) {
+        let currImageItem = liImageItemList[i];
+        let liImageItem = search('img', currImageItem.content)?.[0] || {};
+        let { src } = liImageItem.attrs;
+        if (src) md += `![](${src})\n`;
+      }
+      // 处理标题备注
+      let divNote = search('div[class="note"]', li.content)?.[0] || {}; // 多个标题备注，只有一个图片列表
+      let divNoteSpan = search('span', divNote.content)?.[0] || {};
+      let note = divNoteSpan?.content?.[0] || '';
+      if (note) md += `> ${note} \n`;
 
+      // 处理子节点
       let childContentList = search('div[class="children"]', li.content) || [];
       let { length: childContentListLen } = childContentList;
       for (let i = 0; i < childContentListLen; i++) {
@@ -45,10 +65,6 @@ function walk(list = [], depth = 2) {
     }
   }
 }
-function padImgsToMd(liContentList) {
-  let ulImageList = search('ul[class="image-list"]', li.content)[0];
-}
-
 // 找到一个 list 中符合 指定条件的 项 - 遍历第一个匹配的内容
 function pipeSearch(tags = [], list = []) {
   let result;
@@ -82,7 +98,6 @@ function search(tag = '', list) {
     return currItem;
   });
 }
-
 function genConditions(searchStr = '') {
   // 构造标签条件
   let tagConditionFn = (tag, data) => {
@@ -123,5 +138,3 @@ function getDate() {
 function getMdTitle(depth) {
   return new Array(depth).fill('#').join('') + ' ';
 }
-
-fs.writeFileSync('./result.md', md);
