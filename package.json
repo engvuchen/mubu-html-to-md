@@ -1,12 +1,12 @@
 {
-  "name": "parse-mubu-html-to-md",
+  "name": "mubu-html-to-md",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "parse": "node index.js"
+  "description": "转到幕布导出的HTML为Markdown",
+  "main": "lib/index.js",
+  "author": "engvuchen",
+  "bin": {
+    "mubu-html2md": "bin/index.js"
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "posthtml-parser": "^0.11.0"
