@@ -3,7 +3,8 @@
 const { help, version } = require('../lib/util');
 const cmds = {
   '--convert': () => {
-    require('../lib/index');
+    let { callByCmd } = require('../lib/index');
+    callByCmd();
   },
   '--version': version,
   '-v': version,
